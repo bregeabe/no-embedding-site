@@ -7,12 +7,15 @@ import { institutions } from '../institutions/institutions.jsx'
 
 const Wrapper = styled('div')({
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
   height: '100%',
+  maxWidth: '80%',
   boxSizing: 'border-box',
   gap: theme.spacing.xl,
   padding: theme.spacing.xl,
+  alignSelf: 'center',
 })
 
 const LeftPane = styled('div')({
