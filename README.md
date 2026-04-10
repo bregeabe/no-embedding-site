@@ -1,6 +1,6 @@
 # No Embedding
 
-# Contribute
+## Contribute
 Install packages
 ``` npm i ```
 
