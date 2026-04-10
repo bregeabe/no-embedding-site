@@ -1,1 +1,0 @@
-export const languages = ['Silq', 'Tower', 'QWire', 'QCL', 'Qunity', 'Quipper', 'Twist', 'Qiwi', 'RQC++', 'QML', 'qGCL', 'Scaffold', 'Q#', 'Strawberry Fields', 'TKET', 'Cirq', 'Qiskit', 'LIQUI|>', 'ProjectQ', 'isQ']

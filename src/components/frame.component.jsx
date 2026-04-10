@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles'
+import { Outlet } from 'react-router-dom'
 import theme from '../theme.js'
-import Home from './screens/home/home.jsx'
 
 const FrameRoot = styled('div')({
   display: 'flex',
@@ -62,7 +62,7 @@ function Frame() {
     <FrameRoot>
       <FrameBody>
         <FrameMain>
-          <Home />
+          <Outlet />
         </FrameMain>
       </FrameBody>
     </FrameRoot>

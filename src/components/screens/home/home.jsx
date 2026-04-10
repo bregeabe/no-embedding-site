@@ -1,9 +1,10 @@
 import React from 'react'
 import { styled } from '@mui/material/styles'
+import { useNavigate } from 'react-router-dom'
 import theme from '../../../theme.js'
-import { languages } from '../languages/languages.jsx'
-import { papers } from '../literature/literature.jsx'
-import { institutions } from '../institutions/institutions.jsx'
+import { languages } from '../languages/LanguagesPage.jsx'
+import { papers } from '../literature/LiteraturePage.jsx'
+import { institutions } from '../institutions/InstitutionsPage.jsx'
 
 const Wrapper = styled('div')({
   display: 'flex',
@@ -67,6 +68,12 @@ const DrawerCard = styled('div')({
   flexDirection: 'column',
   gap: theme.spacing.sm,
   overflow: 'hidden',
+  cursor: 'pointer',
+  transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease',
+  '&:hover': {
+    boxShadow: theme.color.shadow,
+    transform: 'translateY(-2px)',
+  },
 })
 
 const DrawerLabel = styled('span')({
@@ -151,6 +158,8 @@ const UniName = styled('span')({
 })
 
 function Home() {
+  const navigate = useNavigate()
+
   return (
     <Wrapper>
       <LeftPane>
@@ -160,12 +169,12 @@ function Home() {
         </Body>
         <Body>
           Contributions are welcome and appreciated; open a PR{' '}
-          <Link href="">here</Link> for any corrections or additions.
+          <Link href="https://github.com/bregeabe/no-embedding-site" target="_blank" rel="noopener noreferrer">here</Link> for any corrections or additions.
         </Body>
       </LeftPane>
 
       <RightPane>
-        <DrawerCard>
+        <DrawerCard onClick={() => navigate('/languages')}>
           <DrawerLabel>Languages</DrawerLabel>
           <LangWrap>
             {languages.map((lang) => (
@@ -174,7 +183,7 @@ function Home() {
           </LangWrap>
         </DrawerCard>
 
-        <DrawerCard>
+        <DrawerCard onClick={() => navigate('/literature')}>
           <DrawerLabel>Literature</DrawerLabel>
           <LiteratureChain>
             {papers.map((paper, i) => (
@@ -188,7 +197,7 @@ function Home() {
           </LiteratureChain>
         </DrawerCard>
 
-        <DrawerCard>
+        <DrawerCard onClick={() => navigate('/institutions')}>
           <DrawerLabel>Institutions</DrawerLabel>
           <InstitutionRow>
             {institutions.map((uni) => (
