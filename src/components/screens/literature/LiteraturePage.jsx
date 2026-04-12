@@ -92,7 +92,7 @@ const literatureData = {
       id: 1,
       title: "Quantum programming languages: survey and bibliography",
       author: "Gay 2005",
-      cover: "../../../public/papers/Quantum programming languages:  survey and bibliography.png",
+      cover: "../../../public/papers/Quantum programming languages  survey and bibliography.png",
       href: "https://arxiv.org/abs/quant-ph/0508218"
     },
     {
@@ -106,7 +106,7 @@ const literatureData = {
       id: 3,
       title: "A Survey of Quantum Programming Languages: History, Methods, and Tools",
       author: "Sofge 2008",
-      cover: "../../../public/papers/A Survey of Quantum Programming Languages:  History, Methods, and Tools.png",
+      cover: "../../../public/papers/A Survey of Quantum Programming Languages  History, Methods, and Tools.png",
       href: "https://arxiv.org/abs/0804.1118"
     },
     {
@@ -143,7 +143,7 @@ const literatureData = {
       id: 6,
       title: "LIQUi|>",
       author: "Google Quantum AI",
-      cover: "../../../public/papers/LIQUi|>.png",
+      cover: "../../../public/papers/LIQUi.png",
       href: "https://example.com/lang3"
     },
     {
