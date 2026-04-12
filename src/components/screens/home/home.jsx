@@ -165,7 +165,7 @@ function Home() {
       <LeftPane>
         <Title>No Embedding</Title>
         <Body>
-          For software engineers and researchers interested in quantum programming languages.
+          For software engineers and researchers interested in building high level quantum programming languages.
         </Body>
         <Body>
           Contributions are welcome and appreciated; open a PR{' '}
@@ -175,7 +175,7 @@ function Home() {
 
       <RightPane>
         <DrawerCard onClick={() => navigate('/languages')}>
-          <DrawerLabel>Languages</DrawerLabel>
+          <DrawerLabel>Languages, libraries, and SDKs</DrawerLabel>
           <LangWrap>
             {languages.map((lang) => (
               <LangChip key={lang}>{lang}</LangChip>
@@ -184,7 +184,7 @@ function Home() {
         </DrawerCard>
 
         <DrawerCard onClick={() => navigate('/literature')}>
-          <DrawerLabel>Literature</DrawerLabel>
+          <DrawerLabel>Surveys, individual languages, and supporting literature</DrawerLabel>
           <LiteratureChain>
             {papers.map((paper, i) => (
               <React.Fragment key={paper.id}>
@@ -198,7 +198,7 @@ function Home() {
         </DrawerCard>
 
         <DrawerCard onClick={() => navigate('/institutions')}>
-          <DrawerLabel>Institutions</DrawerLabel>
+          <DrawerLabel>Professional institutions and academic research groups</DrawerLabel>
           <InstitutionRow>
             {institutions.map((uni) => (
               <InstitutionItem key={uni.name}>
