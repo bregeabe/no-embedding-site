@@ -1,10 +1,8 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { styled } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
 import theme from '../../../theme.js'
-import { languages } from '../languages/LanguagesPage.jsx'
-import { papers } from '../literature/LiteraturePage.jsx'
-import { institutions } from '../institutions/InstitutionsPage.jsx'
+import InstitutionLogo from '../../InstitutionLogo.jsx'
 
 const Wrapper = styled('div')({
   display: 'flex',
@@ -137,6 +135,7 @@ const LiteratureChain = styled('div')({
   overflow: 'auto',
   maxWidth: '100%',
   minHeight: '68px',
+  gap: theme.spacing.sm,
   '&::-webkit-scrollbar': {
     height: '4px',
   },
@@ -151,19 +150,49 @@ const LiteratureChain = styled('div')({
 
 const PaperThumb = styled('div')({
   flexShrink: 0,
-  width: '52px',
+  width: '120px',
   height: '68px',
   borderRadius: theme.layout.borderRadius.sm,
   border: `1px solid ${theme.color.border.secondary}`,
   backgroundColor: theme.color.code.background,
   overflow: 'hidden',
-  '& img': { width: '100%', height: '100%', objectFit: 'cover' },
+  padding: theme.spacing.xs,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
 })
 
-const DottedLine = styled('div')({
-  flex: 1,
-  borderTop: `2px dotted ${theme.color.border.secondary}`,
-  minWidth: '12px',
+const PaperTitle = styled('div')({
+  fontFamily: theme.font.family.body,
+  fontSize: theme.font.size.xs,
+  color: theme.color.text.heading,
+  fontWeight: theme.font.weight.semibold,
+  lineHeight: 1.2,
+  overflow: 'hidden',
+  display: '-webkit-box',
+  '-webkit-line-clamp': 2,
+  '-webkit-box-orient': 'vertical',
+})
+
+const PaperMeta = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2px',
+})
+
+const PaperAuthor = styled('div')({
+  fontFamily: theme.font.family.body,
+  fontSize: '10px',
+  color: theme.color.text.secondary,
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+})
+
+const PaperYear = styled('div')({
+  fontFamily: theme.font.family.mono,
+  fontSize: '10px',
+  color: theme.color.text.secondary,
 })
 
 const InstitutionRow = styled('div')({
@@ -202,7 +231,18 @@ const UniLogo = styled('div')({
   backgroundColor: theme.color.social.background,
   border: `1px solid ${theme.color.border.secondary}`,
   overflow: 'hidden',
-  '& img': { width: '100%', height: '100%', objectFit: 'contain' },
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontFamily: theme.font.family.mono,
+  fontSize: theme.font.size.xs,
+  color: theme.color.text.secondary,
+  fontWeight: theme.font.weight.semibold,
+  '& img': {
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+  },
 })
 
 const UniName = styled('span')({
@@ -213,8 +253,60 @@ const UniName = styled('span')({
   lineHeight: 1.3,
 })
 
+const LoadingText = styled('div')({
+  fontFamily: theme.font.family.body,
+  fontSize: theme.font.size.sm,
+  color: theme.color.text.secondary,
+  textAlign: 'center',
+  padding: theme.spacing.md,
+})
+
 function Home() {
   const navigate = useNavigate()
+  
+  const [languagesData, setLanguagesData] = useState([])
+  const [literatureData, setLiteratureData] = useState([])
+  const [institutionsData, setInstitutionsData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [langResponse, litResponse, instResponse] = await Promise.all([
+          fetch('http://localhost:8080/api/languages').catch(() => ({ ok: false })),
+          fetch('http://localhost:8080/api/literature').catch(() => ({ ok: false })),
+          fetch('http://localhost:8080/api/institutions').catch(() => ({ ok: false }))
+        ])
+
+        if (langResponse.ok) {
+          const langResult = await langResponse.json()
+          if (langResult.success) {
+            setLanguagesData(langResult.data.slice(0, 15))
+          }
+        }
+
+        if (litResponse.ok) {
+          const litResult = await litResponse.json()
+          if (litResult.success) {
+            setLiteratureData(litResult.data.slice(0, 10))
+          }
+        }
+
+        if (instResponse.ok) {
+          const instResult = await instResponse.json()
+          if (instResult.success) {
+            setInstitutionsData(instResult.data.slice(0, 8))
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   return (
     <Wrapper>
@@ -231,39 +323,60 @@ function Home() {
 
       <RightPane>
         <DrawerCard onClick={() => navigate('/languages')}>
-          <DrawerLabel>Languages, libraries, and SDKs</DrawerLabel>
+          <DrawerLabel>Languages, libraries, and SDKs ({languagesData.length || '...'})</DrawerLabel>
           <LangWrap>
-            {languages.map((lang) => (
-              <LangChip key={lang}>{lang}</LangChip>
-            ))}
+            {loading ? (
+              <LoadingText>Loading languages...</LoadingText>
+            ) : languagesData.length > 0 ? (
+              languagesData.map((lang) => (
+                <LangChip key={lang.languageId || lang.id || lang.name}>
+                  {lang.name}
+                </LangChip>
+              ))
+            ) : (
+              <LoadingText>No languages available</LoadingText>
+            )}
           </LangWrap>
         </DrawerCard>
 
         <DrawerCard onClick={() => navigate('/literature')}>
-          <DrawerLabel>Surveys, individual languages, and supporting literature</DrawerLabel>
+          <DrawerLabel>Surveys, individual languages, and supporting literature ({literatureData.length || '...'})</DrawerLabel>
           <LiteratureChain>
-            {papers.map((paper, i) => (
-              <React.Fragment key={paper.id}>
-                <PaperThumb>
-                  {paper.src && <img src={paper.src} alt={paper.alt} />}
+            {loading ? (
+              <LoadingText>Loading literature...</LoadingText>
+            ) : literatureData.length > 0 ? (
+              literatureData.map((paper) => (
+                <PaperThumb key={paper.literatureId || paper.id}>
+                  <PaperTitle>{paper.title}</PaperTitle>
+                  <PaperMeta>
+                    <PaperAuthor>{paper.author}</PaperAuthor>
+                    {paper.publication_year && <PaperYear>{paper.publication_year}</PaperYear>}
+                  </PaperMeta>
                 </PaperThumb>
-                {i < papers.length - 1 && <DottedLine />}
-              </React.Fragment>
-            ))}
+              ))
+            ) : (
+              <LoadingText>No literature available</LoadingText>
+            )}
           </LiteratureChain>
         </DrawerCard>
 
         <DrawerCard onClick={() => navigate('/institutions')}>
-          <DrawerLabel>Professional institutions and academic research groups</DrawerLabel>
+          <DrawerLabel>Professional institutions and academic research groups ({institutionsData.length || '...'})</DrawerLabel>
           <InstitutionRow>
-            {institutions.map((uni) => (
-              <InstitutionItem key={uni.name}>
-                <UniLogo>
-                  {uni.logo && <img src={uni.logo} alt={uni.name} />}
-                </UniLogo>
-                <UniName>{uni.name}</UniName>
-              </InstitutionItem>
-            ))}
+            {loading ? (
+              <LoadingText>Loading institutions...</LoadingText>
+            ) : institutionsData.length > 0 ? (
+              institutionsData.map((institution) => (
+                  <InstitutionItem key={institution.institutionId || institution.id}>
+                    <UniLogo>
+                      <InstitutionLogo name={institution.name || institution.shortName} size={40} />
+                    </UniLogo>
+                    <UniName>{institution.shortName || institution.name}</UniName>
+                  </InstitutionItem>
+              ))
+            ) : (
+              <LoadingText>No institutions available</LoadingText>
+            )}
           </InstitutionRow>
         </DrawerCard>
       </RightPane>
