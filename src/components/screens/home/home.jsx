@@ -11,12 +11,18 @@ const Wrapper = styled('div')({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '100%',
-  maxWidth: '80%',
+  height: '100vh',
+  width: '100vw',
+  maxWidth: '100%',
   boxSizing: 'border-box',
   gap: theme.spacing.xl,
   padding: theme.spacing.xl,
-  alignSelf: 'center',
+  overflow: 'hidden',
+  '@media (max-width: 768px)': {
+    flexDirection: 'column',
+    padding: theme.spacing.md,
+    gap: theme.spacing.md,
+  },
 })
 
 const LeftPane = styled('div')({
@@ -25,6 +31,12 @@ const LeftPane = styled('div')({
   justifyContent: 'center',
   flex: '0 0 320px',
   gap: theme.spacing.lg,
+  minWidth: 0,
+  overflow: 'hidden',
+  '@media (max-width: 768px)': {
+    flex: '0 0 auto',
+    minHeight: 'auto',
+  },
 })
 
 const RightPane = styled('div')({
@@ -32,6 +44,9 @@ const RightPane = styled('div')({
   flexDirection: 'column',
   flex: 1,
   gap: theme.spacing.md,
+  minWidth: 0,
+  overflow: 'auto',
+  maxHeight: '100%',
 })
 
 const Title = styled('h1')({
@@ -70,6 +85,8 @@ const DrawerCard = styled('div')({
   overflow: 'hidden',
   cursor: 'pointer',
   transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease',
+  minHeight: 0,
+  maxHeight: 'calc(33vh - 32px)',
   '&:hover': {
     boxShadow: theme.color.shadow,
     transform: 'translateY(-2px)',
@@ -90,6 +107,18 @@ const LangWrap = styled('div')({
   display: 'flex',
   flexWrap: 'wrap',
   gap: theme.spacing.sm,
+  overflow: 'auto',
+  maxHeight: '120px',
+  '&::-webkit-scrollbar': {
+    width: '4px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.color.border.secondary,
+    borderRadius: '2px',
+  },
 })
 
 const LangChip = styled('span')({
@@ -105,6 +134,19 @@ const LangChip = styled('span')({
 const LiteratureChain = styled('div')({
   display: 'flex',
   alignItems: 'center',
+  overflow: 'auto',
+  maxWidth: '100%',
+  minHeight: '68px',
+  '&::-webkit-scrollbar': {
+    height: '4px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.color.border.secondary,
+    borderRadius: '2px',
+  },
 })
 
 const PaperThumb = styled('div')({
@@ -129,6 +171,20 @@ const InstitutionRow = styled('div')({
   gap: theme.spacing.lg,
   alignItems: 'flex-start',
   flexWrap: 'wrap',
+  overflow: 'auto',
+  maxWidth: '100%',
+  maxHeight: '100px',
+  '&::-webkit-scrollbar': {
+    height: '4px',
+    width: '4px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.color.border.secondary,
+    borderRadius: '2px',
+  },
 })
 
 const InstitutionItem = styled('div')({
