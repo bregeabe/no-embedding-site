@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { styled } from '@mui/material/styles'
 
 const LogoImage = styled('img')({
-  marginRight: '8px',
   borderRadius: '4px',
   objectFit: 'contain',
 })
