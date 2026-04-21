@@ -56,6 +56,33 @@ const LanguageCode = styled('p')({
   borderRadius: theme.layout.borderRadius.sm,
 })
 
+const LanguageType = styled('p')({
+  fontFamily: theme.font.family.mono,
+  fontSize: theme.font.size.sm,
+  color: theme.color.text.secondary,
+  margin: `0 0 ${theme.spacing.sm} 0`,
+  backgroundColor: theme.color.code.background,
+  padding: theme.spacing.xs,
+  borderRadius: theme.layout.borderRadius.sm,
+})
+
+const LanguageHost = styled('p')({
+  fontFamily: theme.font.family.mono,
+  fontSize: theme.font.size.sm,
+  color: theme.color.text.secondary,
+  margin: `0 0 ${theme.spacing.sm} 0`,
+  backgroundColor: theme.color.code.background,
+  padding: theme.spacing.xs,
+  borderRadius: theme.layout.borderRadius.sm,
+})
+
+const LanguageHeader = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  marginBottom: theme.spacing.sm,
+})
+
 const Description = styled('p')({
   fontFamily: theme.font.family.body,
   fontSize: theme.font.size.body,
@@ -150,9 +177,14 @@ function LanguagesPage() {
       <LanguageGrid>
         {languagesData.map((language) => (
           <LanguageCard key={language.languageId || language.id}>
+            <LanguageHeader>
+              {language.code && <LanguageCode>Code: {language.code}</LanguageCode>}
+              {language.type && <LanguageType>{language.type}</LanguageType>}
+              {language.host && <LanguageHost>{language.host}</LanguageHost>}
+            </LanguageHeader>
             <LanguageName>{language.name}</LanguageName>
-            {language.code && <LanguageCode>Code: {language.code}</LanguageCode>}
             {language.description && <Description>{language.description}</Description>}
+
             
             {language.associations && (
               <>
