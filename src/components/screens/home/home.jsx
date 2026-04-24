@@ -47,6 +47,30 @@ const RightPane = styled('div')({
   maxHeight: '100%',
 })
 
+const OverviewContainer = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.sm,
+  height: '100%',
+})
+
+const OverviewTree = styled('div')({
+  display: 'flex',
+  flexDirection: 'row',
+  maxHeight: "400px",
+  maxWidth: "80%",
+  gap: theme.spacing.sm,
+})
+
+const OverviewNode = styled('div')({
+  position: 'relative',
+  width: "500px",
+  height: "200px",
+  border: `1px solid ${theme.color.border.secondary}`,
+  borderRadius: theme.layout.borderRadius.md,
+})
+
+
 const Title = styled('h1')({
   fontFamily: theme.font.family.heading,
   fontWeight: theme.font.weight.bold,
@@ -261,6 +285,7 @@ const LoadingText = styled('div')({
   padding: theme.spacing.md,
 })
 
+
 function Home() {
   const navigate = useNavigate()
   
@@ -269,6 +294,23 @@ function Home() {
   const [institutionsData, setInstitutionsData] = useState([])
   const [loading, setLoading] = useState(true)
 
+  function renderNode(nodeData) {
+    if (!nodeData) return null;
+    if (
+      nodeData.institutionId &&
+      (!nodeData.languageId ||
+      !nodeData.literatureId) &&
+      nodeData.associations?.researchGroups
+    ) {
+    
+    }
+  }
+
+  function renderTree(institutionsData) {
+    institutionsData.forEach(institution => {
+      const institutionNode = renderNode(institution)
+    })
+  }
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -308,6 +350,8 @@ function Home() {
     fetchData()
   }, [])
 
+  console.log(institutionsData)
+
   return (
     <Wrapper>
       <LeftPane>
@@ -321,8 +365,23 @@ function Home() {
         </Body>
       </LeftPane>
 
-      <RightPane>
-        <DrawerCard onClick={() => navigate('/languages')}>
+      <RightPane id="rightpane">
+        <OverviewContainer id="overviewcontainer">
+<OverviewTree>
+  <OverviewNode>
+  </OverviewNode>
+    <OverviewNode>
+  </OverviewNode>
+</OverviewTree>
+<OverviewTree>
+  <OverviewNode>
+  </OverviewNode>
+    <OverviewNode>
+  </OverviewNode>
+</OverviewTree>
+          </OverviewContainer>
+
+        {/* <DrawerCard onClick={() => navigate('/languages')}>
           <DrawerLabel>Languages, libraries, and SDKs ({languagesData.length || '...'})</DrawerLabel>
           <LangWrap>
             {loading ? (
@@ -378,7 +437,7 @@ function Home() {
               <LoadingText>No institutions available</LoadingText>
             )}
           </InstitutionRow>
-        </DrawerCard>
+        </DrawerCard> */}
       </RightPane>
     </Wrapper>
   )
