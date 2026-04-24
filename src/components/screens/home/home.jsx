@@ -281,21 +281,21 @@ function Home() {
         if (langResponse.ok) {
           const langResult = await langResponse.json()
           if (langResult.success) {
-            setLanguagesData(langResult.data.slice(0, 15))
+            setLanguagesData(langResult.data)
           }
         }
 
         if (litResponse.ok) {
           const litResult = await litResponse.json()
           if (litResult.success) {
-            setLiteratureData(litResult.data.slice(0, 10))
+            setLiteratureData(litResult.data)
           }
         }
 
         if (instResponse.ok) {
           const instResult = await instResponse.json()
           if (instResult.success) {
-            setInstitutionsData(instResult.data.slice(0, 8))
+            setInstitutionsData(instResult.data)
           }
         }
       } catch (error) {
@@ -361,13 +361,13 @@ function Home() {
         </DrawerCard>
 
         <DrawerCard onClick={() => navigate('/institutions')}>
-          <DrawerLabel>Professional institutions and academic research groups ({institutionsData.length || '...'})</DrawerLabel>
+          <DrawerLabel>Professional institutions and academic institutions ({institutionsData.length || '...'})</DrawerLabel>
           <InstitutionRow>
             {loading ? (
               <LoadingText>Loading institutions...</LoadingText>
             ) : institutionsData.length > 0 ? (
               institutionsData.map((institution) => (
-                  <InstitutionItem key={institution.institutionId || institution.id}>
+                  <InstitutionItem key={institution.institutionId}>
                     <UniLogo>
                       <InstitutionLogo name={institution.name || institution.shortName} size={40} />
                     </UniLogo>

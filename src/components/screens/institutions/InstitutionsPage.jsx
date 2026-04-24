@@ -173,7 +173,7 @@ function InstitutionsPage() {
       <PageTitle>Institutions ({institutionsData.length})</PageTitle>
       <InstitutionGrid>
         {institutionsData.map((institution) => (
-            <InstitutionCard key={institution.institutionId || institution.id}>
+            <InstitutionCard key={institution.institutionId}>
               <InstitutionHeader>
                 <InstitutionLogo name={institution.name || institution.shortName} size={32} />
                 <InstitutionNameContainer>
