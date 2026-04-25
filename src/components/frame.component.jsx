@@ -21,7 +21,6 @@ const FrameHeader = styled('header')({
   alignItems: 'center',
   padding: `0 ${theme.spacing.lg}`,
   backgroundColor: theme.color.background,
-  borderBottom: `${theme.layout.borderWidth} solid ${theme.color.border.primary}`,
   color: theme.color.text.primary,
   boxSizing: 'border-box',
   flexShrink: 0,
@@ -45,6 +44,9 @@ function Frame() {
     <FrameRoot id="frame-root">
       <FrameBody>
         <FrameMain>
+          <FrameHeader>
+            <i>"Superficially this may strike the reader as a very negative, or perhaps schizophrenic, paper." - Bădescu and Panangaden 2015.</i>
+          </FrameHeader>
           <Outlet />
         </FrameMain>
       </FrameBody>
