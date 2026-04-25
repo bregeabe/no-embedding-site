@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { styled } from '@mui/material/styles'
 import theme from '../../../theme.js'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
@@ -240,77 +240,6 @@ const DagCanvas = styled('div')({
   paddingBottom: theme.spacing.sm,
 })
 
-const DagBranch = styled('div')({
-  display: 'flex',
-  // backgroundColor: 'green',
-  gap: theme.spacing.md,
-  alignItems: 'center',
-  justifyContent: 'flex-start',
-  minHeight: '70px',
-})
-
-const ChildrenRail = styled('div')({
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.sm,
-  paddingLeft: theme.spacing.md,
-  // backgroundColor: 'pink',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    left: 0,
-    top: '20px',
-    bottom: '20px',
-    width: '1px',
-    backgroundColor: theme.color.border.secondary,
-  },
-})
-
-const ChildBranchLeft = styled('div')({
-  content: '""',
-  position: 'absolute',
-  top: '50%',
-  left: 0,
-  transform: 'translate(-100%, -50%)',
-  height: '1px',
-  width: theme.spacing.md,
-  backgroundColor: 'black',
-})
-
-const ChildBranchRight = styled('div')({
-  content: '""',
-  position: 'absolute',
-  transform: 'translate(100%, -50%)',
-  height: '1px',
-  top: '50%',
-  right: '0px',
-  width: theme.spacing.md,
-  backgroundColor: 'black',
-})
-
-const CardWithBranches = styled('div')({
-  position: 'relative',
-  display: 'inline-flex',
-  alignItems: 'center',
-})
-
-const ChildEdge = styled('div')({
-  position: 'relative',
-  // backgroundColor: 'red',
-  // paddingLeft: theme.spacing.md,
-  // '&::before': {
-  //   alignSelf: 'flex-start',
-  //   content: '""',
-  //   position: 'absolute',
-  //   left: 0,
-  //   top: '20px',
-  //   width: theme.spacing.md,
-  //   height: '1px',
-  //   backgroundColor: theme.color.border.secondary,
-  // },
-})
-
 const NodeCard = styled('div', {
   shouldForwardProp: (prop) => prop !== 'nodeType',
 })(({ nodeType }) => ({
@@ -400,6 +329,72 @@ const LoadingText = styled('div')({
   padding: theme.spacing.md,
 })
 
+const HorizontalArm = styled('div')({
+  width: theme.spacing.md,
+  height: '1px',
+  backgroundColor: theme.color.border.primary,
+  flexShrink: 0,
+})
+
+const SpineContainer = styled('div')({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.sm,
+})
+
+// vertical connector of branches
+function BranchSpine({ children, showSpine, cardRefs }) {
+  const railRef = useRef(null)
+  const spineRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const rail = railRef.current
+    const spine = spineRef.current
+    if (!rail || !spine || !showSpine || !cardRefs?.length) {
+      if (spine) spine.style.display = 'none'
+      return
+    }
+    if (cardRefs.length < 2) {
+      spine.style.display = 'none'
+      return
+    }
+
+    const railRect = rail.getBoundingClientRect()
+
+    const firstEl = cardRefs[0].current
+    const lastEl = cardRefs[cardRefs.length - 1].current
+    if (!firstEl || !lastEl) { spine.style.display = 'none'; return }
+
+    const firstRect = firstEl.getBoundingClientRect()
+    const lastRect = lastEl.getBoundingClientRect()
+
+    const firstMid = firstRect.top + firstRect.height / 2 - railRect.top
+    const lastMid = lastRect.top + lastRect.height / 2 - railRect.top
+
+    spine.style.display = 'block'
+    spine.style.top = firstMid + 'px'
+    spine.style.height = (lastMid - firstMid) + 'px'
+  })
+
+  return (
+    <SpineContainer ref={railRef}>
+      {showSpine && (
+        <div
+          ref={spineRef}
+          style={{
+            position: 'absolute',
+            left: 0,
+            width: '1px',
+            backgroundColor: theme.color.border.primary,
+            display: 'none',
+          }}
+        />
+      )}
+      {children}
+    </SpineContainer>
+  )
+}
 
 function Home() {
   const [loading, setLoading] = useState(true)
@@ -453,37 +448,44 @@ function Home() {
   function renderNode(nodeData, nodeType, keyPrefix) {
     if (!nodeData) return null
 
-    const withCardBranches = (node, showLeftBranch, showRightBranch) => (
-      <CardWithBranches>
-        {showLeftBranch && <ChildBranchLeft id={`${keyPrefix}-branch-left`} />}
-        {node}
-        {showRightBranch && <ChildBranchRight id={`${keyPrefix}-branch-right`} />}
-      </CardWithBranches>
-    )
+    const renderWithChildren = (card, children, childNodeType, showLeftArm) => {
+      const cardRefs = children.map(() => React.createRef())
 
-    const renderChildren = (children, childNodeType) => {
-      if (!children.length) return null
+      const childRows = children.map((child, index) => (
+        <div
+          key={`${keyPrefix}-${childNodeType}-${index}`}
+          style={{ display: 'flex', alignItems: 'center' }}
+        >
+          <HorizontalArm />
+          {renderNode(child, childNodeType, `${keyPrefix}-${childNodeType}-${index}`, cardRefs[index])}
+        </div>
+      ))
+
       return (
-        <ChildrenRail>
-          {children.map((child, index) => (
-            <ChildEdge key={`${keyPrefix}-${childNodeType}-${index}`}>
-              {renderNode(child, childNodeType, `${keyPrefix}-${childNodeType}-${index}`)}
-            </ChildEdge>
-          ))}
-        </ChildrenRail>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {showLeftArm && <HorizontalArm />}
+          {card}
+          {children.length > 0 && (
+            <>
+              <HorizontalArm />
+              <BranchSpine showSpine={children.length > 1} cardRefs={cardRefs}>
+                {childRows}
+              </BranchSpine>
+            </>
+          )}
+        </div>
       )
     }
 
-    if (nodeType === 'institution') {
-      const researchGroups = asArray(nodeData.associations?.researchGroups)
-      const directLiterature = asArray(nodeData.associations?.literature)
-      const childNodeType = researchGroups.length > 0 ? 'researchGroup' : 'literature'
-      const institutionChildren = researchGroups.length > 0 ? researchGroups : directLiterature
-      const hasChildren = institutionChildren.length > 0
+    function inner(cardRef) {
+      if (nodeType === 'institution') {
+        const researchGroups = asArray(nodeData.associations?.researchGroups)
+        const directLiterature = asArray(nodeData.associations?.literature)
+        const childNodeType = researchGroups.length > 0 ? 'researchGroup' : 'literature'
+        const institutionChildren = researchGroups.length > 0 ? researchGroups : directLiterature
 
-      return (
-        <DagBranch>
-          {withCardBranches(
+        const card = (
+          <div ref={cardRef}>
             <NodeCard nodeType="institution">
               <InstitutionHead>
                 <UniLogo>
@@ -494,99 +496,51 @@ function Home() {
                   <NodeSubtitle>{nodeData.name}</NodeSubtitle>
                 </div>
               </InstitutionHead>
-            </NodeCard>,
-            false,
-            hasChildren
-          )}
-          {hasChildren && (
-            <ChildrenRail id={`${keyPrefix}-childrenrail`}>
-              {institutionChildren.map((child, index) => (
-                <div style={{ display: 'flex', flexDirection: 'column' }} key={`${keyPrefix}-${childNodeType}-${index}`} id={`${keyPrefix}-${childNodeType}-${index}`}>
-                  <ChildEdge key={`${keyPrefix}-${childNodeType}-${index}`} id={`${keyPrefix}-${childNodeType}-${index}`}>
-                    {renderNode(child, childNodeType, `${keyPrefix}-${childNodeType}-${index}`)}
-                  </ChildEdge>
-                </div>
-              ))}
-            </ChildrenRail>
-          )}
-        </DagBranch>
-      )
-    }
+            </NodeCard>
+          </div>
+        )
+        return renderWithChildren(card, institutionChildren, childNodeType, false)
+      }
 
-    if (nodeType === 'researchGroup') {
-      const literature = asArray(nodeData.associations?.literature)
-      const hasChildren = literature.length > 0
+      if (nodeType === 'researchGroup') {
+        const literature = asArray(nodeData.associations?.literature)
+        const card = <div ref={cardRef}><NodeCard nodeType="researchGroup"><NodeTitle>{nodeData.name || 'Research Group'}</NodeTitle></NodeCard></div>
+        return renderWithChildren(card, literature, 'literature', true)
+      }
 
-      return (
-        <DagBranch id={`${keyPrefix}-dagbranch`}>
-          {withCardBranches(
-            <NodeCard nodeType="researchGroup" id={`${keyPrefix}-nodecard`}>
-              <NodeTitle>{nodeData.name || 'Research Group'}</NodeTitle>
-            </NodeCard>,
-            true,
-            hasChildren
-          )}
-          {renderChildren(literature, 'literature')}
-        </DagBranch>
-      )
-    }
-
-    if (nodeType === 'literature') {
-      const languageFromArray = asArray(nodeData.associations?.languages)
-      const languageFromSingle = asArray(nodeData.associations?.language)
-      const languages = languageFromArray.length > 0 ? languageFromArray : languageFromSingle
-      const hasChildren = languages.length > 0
-
-      return (
-        <DagBranch id={`${keyPrefix}-dagbranch`}>
-          {withCardBranches(
-            <NodeCard nodeType="literature" id={`${keyPrefix}-nodecard`}>
+      if (nodeType === 'literature') {
+        const languageFromArray = asArray(nodeData.associations?.languages)
+        const languageFromSingle = asArray(nodeData.associations?.language)
+        const languages = languageFromArray.length > 0 ? languageFromArray : languageFromSingle
+        const card = (
+          <div ref={cardRef}>
+            <NodeCard nodeType="literature">
               <NodeTitle>{nodeData.title || 'Untitled literature'}</NodeTitle>
               <NodeSubtitle>{nodeData.author || 'Unknown author'}</NodeSubtitle>
-            </NodeCard>,
-            true,
-            hasChildren
-          )}
-          {renderChildren(languages, 'language')}
-        </DagBranch>
-      )
-    }
-
-    if (nodeType === 'language') {
-      return (
-        withCardBranches(
-          <NodeCard nodeType="language" id={`${keyPrefix}-nodecard`}>
-            <NodeTitle>{nodeData.name || 'Unknown language'}</NodeTitle>
-          </NodeCard>,
-          true,
-          false
+            </NodeCard>
+          </div>
         )
-      )
-    }
-
-    return null
-  }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const instResponse = await fetch('http://localhost:8080/api/institutions').catch(() => ({ ok: false }))
-
-        if (instResponse.ok) {
-          const instResult = await instResponse.json()
-          if (instResult.success) {
-            setInstitutionsData(instResult.data)
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
+        return renderWithChildren(card, languages, 'language', true)
       }
+
+      if (nodeType === 'language') {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <HorizontalArm />
+            <div ref={cardRef}>
+              <NodeCard nodeType="language">
+                <NodeTitle>{nodeData.name || 'Unknown language'}</NodeTitle>
+              </NodeCard>
+            </div>
+          </div>
+        )
+      }
+
+      return null
     }
 
-    fetchData()
-  }, [])
+    return inner(arguments[3] ?? null)
+  }
 
   return (
     <Wrapper>
