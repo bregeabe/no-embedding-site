@@ -14,18 +14,6 @@ const FrameRoot = styled('div')({
   fontFamily: theme.font.family.body,
 })
 
-const FrameHeader = styled('header')({
-  width: '100%',
-  height: theme.layout.headerHeight,
-  display: 'flex',
-  alignItems: 'center',
-  padding: `0 ${theme.spacing.lg}`,
-  backgroundColor: theme.color.background,
-  color: theme.color.text.primary,
-  boxSizing: 'border-box',
-  flexShrink: 0,
-})
-
 const FrameBody = styled('div')({
   display: 'flex',
   flex: 1,
@@ -44,9 +32,6 @@ function Frame() {
     <FrameRoot id="frame-root">
       <FrameBody>
         <FrameMain>
-          <FrameHeader>
-            <i>"Superficially this may strike the reader as a very negative, or perhaps schizophrenic, paper." - Bădescu and Panangaden 2015.</i>
-          </FrameHeader>
           <Outlet />
         </FrameMain>
       </FrameBody>

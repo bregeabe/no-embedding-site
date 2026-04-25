@@ -22,6 +22,22 @@ const Wrapper = styled('div')({
     padding: theme.spacing.md,
     gap: theme.spacing.md,
   },
+  marginTop: theme.layout.headerHeight,
+})
+
+const FrameHeader = styled('header')({
+  position: 'absolute',
+  top: 0,
+  width: '100%',
+  height: theme.layout.headerHeight,
+  display: 'flex',
+  alignItems: 'center',
+  padding: `0 ${theme.spacing.lg}`,
+  backgroundColor: theme.color.background,
+  color: theme.color.text.primary,
+  boxSizing: 'border-box',
+  flexShrink: 0,
+  fontSize: theme.font.size.sm,
 })
 
 const LeftPane = styled('div')({
@@ -559,6 +575,9 @@ function Home() {
 
   return (
     <Wrapper>
+      <FrameHeader>
+        <i>"Superficially this may strike the reader as a very negative, or perhaps schizophrenic, paper." - Bădescu and Panangaden 2015.</i>
+      </FrameHeader>
       <LeftPane>
         <Title>No Embedding</Title>
         <Body>
