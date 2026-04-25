@@ -396,6 +396,17 @@ function BranchSpine({ children, showSpine, cardRefs }) {
   )
 }
 
+function countNodes(node) {
+  if (!node) return 0
+  const children = [
+    ...(node.associations?.researchGroups ? (Array.isArray(node.associations.researchGroups) ? node.associations.researchGroups : [node.associations.researchGroups]) : []),
+    ...(node.associations?.literature ? (Array.isArray(node.associations.literature) ? node.associations.literature : [node.associations.literature]) : []),
+    ...(node.associations?.languages ? (Array.isArray(node.associations.languages) ? node.associations.languages : [node.associations.languages]) : []),
+    ...(node.associations?.language ? (Array.isArray(node.associations.language) ? node.associations.language : [node.associations.language]) : []),
+  ]
+  return 1 + children.reduce((sum, child) => sum + countNodes(child), 0)
+}
+
 function Home() {
   const [loading, setLoading] = useState(true)
   const [institutionsData, setInstitutionsData] = useState([])
@@ -620,11 +631,13 @@ function Home() {
             <LoadingText>Loading graph data...</LoadingText>
           ) : institutionsData.length > 0 ? (
             <DagCanvas>
-              {institutionsData.map((institution, index) => (
-                <div key={institution.institutionId || institution.id || index}>
-                  {renderNode(institution, 'institution', `institution-${index}`)}
-                </div>
-              ))}
+              {[...institutionsData]
+                .sort((a, b) => countNodes(b) - countNodes(a))
+                .map((institution, index) => (
+                  <div key={institution.institutionId || institution.id || index}>
+                    {renderNode(institution, 'institution', `institution-${index}`)}
+                  </div>
+                ))}
             </DagCanvas>
           ) : (
             <LoadingText>No institution graph data available</LoadingText>
