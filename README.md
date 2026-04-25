@@ -6,3 +6,8 @@ Install packages
 
 Start server
 ``` npm run dev ```
+
+## .env
+```
+VITE_BASE=http://localhost:8080/api
+```
