@@ -8,9 +8,8 @@ const Wrapper = styled('div')({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '100vh',
+  height: '100%',
   width: '100vw',
-  maxWidth: '100%',
   boxSizing: 'border-box',
   gap: theme.spacing.xl,
   padding: theme.spacing.xl,
@@ -25,10 +24,11 @@ const Wrapper = styled('div')({
 const LeftPane = styled('div')({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   flex: '0 0 320px',
   gap: theme.spacing.lg,
   minWidth: 0,
+  height: '100%',
   overflow: 'hidden',
   '@media (max-width: 768px)': {
     flex: '0 0 auto',
@@ -44,6 +44,7 @@ const RightPane = styled('div')({
   minWidth: 0,
   overflow: 'hidden',
   maxHeight: '100%',
+  width: '100%',
 })
 
 const InstitutionItem = styled('div')({
@@ -64,10 +65,10 @@ const DrawerCard = styled('div')({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.sm,
-  overflow: 'hidden',
   cursor: 'pointer',
   transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease',
   minHeight: 150,
+  height: '100%',
   '&:hover': {
     boxShadow: theme.color.shadow,
     transform: 'translateY(-2px)',

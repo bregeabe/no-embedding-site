@@ -5,12 +5,11 @@ import theme from '../theme.js'
 const FrameRoot = styled('div')({
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh',
+  minHeight: '100%',
   width: '100%',
   maxWidth: '100%',
   backgroundColor: theme.color.background,
   color: theme.color.text.primary,
-  overflow: 'hidden',
   boxSizing: 'border-box',
   fontFamily: theme.font.family.body,
 })
@@ -28,25 +27,10 @@ const FrameHeader = styled('header')({
   flexShrink: 0,
 })
 
-const FrameLogo = styled('span')({
-  fontWeight: theme.font.weight.semibold,
-  fontSize: theme.font.size.logo,
-})
-
 const FrameBody = styled('div')({
   display: 'flex',
   flex: 1,
   width: '100%',
-  overflow: 'hidden',
-})
-
-const FrameSidebar = styled('aside')({
-  width: theme.layout.sidebarWidth,
-  height: '100%',
-  backgroundColor: theme.color.background,
-  borderRight: `${theme.layout.borderWidth} solid ${theme.color.border.primary}`,
-  flexShrink: 0,
-  boxSizing: 'border-box',
 })
 
 const FrameMain = styled('main')({
@@ -54,12 +38,11 @@ const FrameMain = styled('main')({
   display: 'flex',
   flexDirection: 'column',
   boxSizing: 'border-box',
-  overflowY: 'auto',
 })
 
 function Frame() {
   return (
-    <FrameRoot>
+    <FrameRoot id="frame-root">
       <FrameBody>
         <FrameMain>
           <Outlet />
