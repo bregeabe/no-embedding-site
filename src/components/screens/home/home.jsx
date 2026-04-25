@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { styled } from '@mui/material/styles'
-import { useNavigate } from 'react-router-dom'
 import theme from '../../../theme.js'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
+import { useNavigate } from 'react-router-dom'
+
+const BASE_URL = import.meta.env.VITE_BASE
 
 const Wrapper = styled('div')({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '100vh',
+  height: '100%',
   width: '100vw',
-  maxWidth: '100%',
   boxSizing: 'border-box',
   gap: theme.spacing.xl,
   padding: theme.spacing.xl,
@@ -26,10 +27,11 @@ const Wrapper = styled('div')({
 const LeftPane = styled('div')({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   flex: '0 0 320px',
   gap: theme.spacing.lg,
   minWidth: 0,
+  height: '100%',
   overflow: 'hidden',
   '@media (max-width: 768px)': {
     flex: '0 0 auto',
@@ -43,31 +45,17 @@ const RightPane = styled('div')({
   flex: 1,
   gap: theme.spacing.md,
   minWidth: 0,
-  overflow: 'auto',
+  overflow: 'hidden',
   maxHeight: '100%',
+  width: '100%',
 })
 
-const Title = styled('h1')({
-  fontFamily: theme.font.family.heading,
-  fontWeight: theme.font.weight.bold,
-  fontSize: theme.font.size.xl,
-  color: theme.color.text.heading,
-  margin: 0,
-})
-
-const Body = styled('p')({
-  fontFamily: theme.font.family.body,
-  fontWeight: theme.font.weight.normal,
-  fontSize: theme.font.size.body,
-  color: theme.color.text.secondary,
-  lineHeight: theme.font.lineHeight.body,
-  margin: 0,
-})
-
-const Link = styled('a')({
-  color: theme.color.link.default,
-  textDecoration: 'none',
-  '&:hover': { color: theme.color.link.hover },
+const InstitutionItem = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: theme.spacing.xs,
+  width: '64px',
 })
 
 const DrawerCard = styled('div')({
@@ -80,11 +68,10 @@ const DrawerCard = styled('div')({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.sm,
-  overflow: 'hidden',
   cursor: 'pointer',
   transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease',
-  minHeight: 0,
-  maxHeight: 'calc(33vh - 32px)',
+  minHeight: 150,
+  height: '100%',
   '&:hover': {
     boxShadow: theme.color.shadow,
     transform: 'translateY(-2px)',
@@ -100,7 +87,6 @@ const DrawerLabel = styled('span')({
   letterSpacing: '0.08em',
   alignSelf: 'flex-start',
 })
-
 const LangWrap = styled('div')({
   display: 'flex',
   flexWrap: 'wrap',
@@ -216,34 +202,6 @@ const InstitutionRow = styled('div')({
   },
 })
 
-const InstitutionItem = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: theme.spacing.xs,
-  width: '64px',
-})
-
-const UniLogo = styled('div')({
-  width: '40px',
-  height: '40px',
-  borderRadius: theme.layout.borderRadius.sm,
-  backgroundColor: theme.color.social.background,
-  border: `1px solid ${theme.color.border.secondary}`,
-  overflow: 'hidden',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontFamily: theme.font.family.mono,
-  fontSize: theme.font.size.xs,
-  color: theme.color.text.secondary,
-  fontWeight: theme.font.weight.semibold,
-  '& img': {
-    width: '100%',
-    height: '100%',
-    objectFit: 'contain',
-  },
-})
 
 const UniName = styled('span')({
   fontFamily: theme.font.family.body,
@@ -251,6 +209,119 @@ const UniName = styled('span')({
   color: theme.color.text.secondary,
   textAlign: 'center',
   lineHeight: 1.3,
+})
+
+const OverviewContainer = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.md,
+  height: '100%',
+  border: `1px solid ${theme.color.border.secondary}`,
+  borderRadius: theme.layout.borderRadius.md,
+  padding: theme.spacing.md,
+  boxSizing: 'border-box',
+  backgroundColor: theme.color.background,
+  overflow: 'auto',
+})
+
+const OverviewHeading = styled('h2')({
+  margin: 0,
+  fontFamily: theme.font.family.ui,
+  fontSize: theme.font.size.sm,
+  fontWeight: theme.font.weight.semibold,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  color: theme.color.text.secondary,
+})
+
+const DagCanvas = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+  // backgroundColor: 'blue',
+  gap: theme.spacing.lg,
+  minWidth: 'max-content',
+  paddingBottom: theme.spacing.sm,
+})
+
+const NodeCard = styled('div', {
+  shouldForwardProp: (prop) => prop !== 'nodeType',
+})(({ nodeType }) => ({
+  border: `1px solid ${theme.color.border.secondary}`,
+  borderRadius: theme.layout.borderRadius.md,
+  padding: theme.spacing.sm,
+  minWidth: nodeType === 'institution' ? '220px' : '180px',
+  maxWidth: '280px',
+  backgroundColor:
+    nodeType === 'institution'
+      ? theme.color.social.background
+      : nodeType === 'researchGroup'
+        ? theme.color.code.background
+        : nodeType === 'literature'
+          ? '#ffffff'
+          : theme.color.background,
+  // backgroundColor: "blue",
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2px',
+}))
+
+const NodeTitle = styled('div')({
+  fontFamily: theme.font.family.ui,
+  fontSize: theme.font.size.sm,
+  fontWeight: theme.font.weight.semibold,
+  color: theme.color.text.heading,
+  lineHeight: 1.3,
+})
+
+const NodeSubtitle = styled('div')({
+  fontFamily: theme.font.family.body,
+  fontSize: theme.font.size.xs,
+  color: theme.color.text.secondary,
+  lineHeight: 1.3,
+})
+
+const InstitutionHead = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing.sm,
+  // backgroundColor: 'red',
+})
+
+const UniLogo = styled('div')({
+  width: '36px',
+  height: '36px',
+  borderRadius: theme.layout.borderRadius.sm,
+  backgroundColor: theme.color.background,
+  border: `1px solid ${theme.color.border.secondary}`,
+  overflow: 'hidden',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+})
+
+
+const Title = styled('h1')({
+  fontFamily: theme.font.family.heading,
+  fontWeight: theme.font.weight.bold,
+  fontSize: theme.font.size.xl,
+  color: theme.color.text.heading,
+  margin: 0,
+})
+
+const Body = styled('p')({
+  fontFamily: theme.font.family.body,
+  fontWeight: theme.font.weight.normal,
+  fontSize: theme.font.size.body,
+  color: theme.color.text.secondary,
+  lineHeight: theme.font.lineHeight.body,
+  margin: 0,
+})
+
+const Link = styled('a')({
+  color: theme.color.link.default,
+  textDecoration: 'none',
+  '&:hover': { color: theme.color.link.hover },
 })
 
 const LoadingText = styled('div')({
@@ -261,21 +332,97 @@ const LoadingText = styled('div')({
   padding: theme.spacing.md,
 })
 
+const HorizontalArm = styled('div')({
+  width: theme.spacing.md,
+  height: '1px',
+  backgroundColor: theme.color.border.primary,
+  flexShrink: 0,
+})
+
+const SpineContainer = styled('div')({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.sm,
+})
+
+// vertical connector of branches
+function BranchSpine({ children, showSpine, cardRefs }) {
+  const railRef = useRef(null)
+  const spineRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const rail = railRef.current
+    const spine = spineRef.current
+    if (!rail || !spine || !showSpine || !cardRefs?.length) {
+      if (spine) spine.style.display = 'none'
+      return
+    }
+    if (cardRefs.length < 2) {
+      spine.style.display = 'none'
+      return
+    }
+
+    const railRect = rail.getBoundingClientRect()
+
+    const firstEl = cardRefs[0].current
+    const lastEl = cardRefs[cardRefs.length - 1].current
+    if (!firstEl || !lastEl) { spine.style.display = 'none'; return }
+
+    const firstRect = firstEl.getBoundingClientRect()
+    const lastRect = lastEl.getBoundingClientRect()
+
+    const firstMid = firstRect.top + firstRect.height / 2 - railRect.top
+    const lastMid = lastRect.top + lastRect.height / 2 - railRect.top
+
+    spine.style.display = 'block'
+    spine.style.top = firstMid + 'px'
+    spine.style.height = (lastMid - firstMid) + 'px'
+  })
+
+  return (
+    <SpineContainer ref={railRef}>
+      {showSpine && (
+        <div
+          ref={spineRef}
+          style={{
+            position: 'absolute',
+            left: 0,
+            width: '1px',
+            backgroundColor: theme.color.border.primary,
+            display: 'none',
+          }}
+        />
+      )}
+      {children}
+    </SpineContainer>
+  )
+}
+
+function countNodes(node) {
+  if (!node) return 0
+  const children = [
+    ...(node.associations?.researchGroups ? (Array.isArray(node.associations.researchGroups) ? node.associations.researchGroups : [node.associations.researchGroups]) : []),
+    ...(node.associations?.literature ? (Array.isArray(node.associations.literature) ? node.associations.literature : [node.associations.literature]) : []),
+    ...(node.associations?.languages ? (Array.isArray(node.associations.languages) ? node.associations.languages : [node.associations.languages]) : []),
+    ...(node.associations?.language ? (Array.isArray(node.associations.language) ? node.associations.language : [node.associations.language]) : []),
+  ]
+  return 1 + children.reduce((sum, child) => sum + countNodes(child), 0)
+}
+
 function Home() {
-  const navigate = useNavigate()
-  
+  const [loading, setLoading] = useState(true)
+  const [institutionsData, setInstitutionsData] = useState([])
   const [languagesData, setLanguagesData] = useState([])
   const [literatureData, setLiteratureData] = useState([])
-  const [institutionsData, setInstitutionsData] = useState([])
-  const [loading, setLoading] = useState(true)
-
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [langResponse, litResponse, instResponse] = await Promise.all([
-          fetch('http://localhost:8080/api/languages').catch(() => ({ ok: false })),
-          fetch('http://localhost:8080/api/literature').catch(() => ({ ok: false })),
-          fetch('http://localhost:8080/api/institutions').catch(() => ({ ok: false }))
+          fetch(`${BASE_URL}/languages`).catch(() => ({ ok: false })),
+          fetch(`${BASE_URL}/literature`).catch(() => ({ ok: false })),
+          fetch(`${BASE_URL}/institutions`).catch(() => ({ ok: false }))
         ])
 
         if (langResponse.ok) {
@@ -308,6 +455,108 @@ function Home() {
     fetchData()
   }, [])
 
+  const asArray = (value) => {
+    if (!value) return []
+    return Array.isArray(value) ? value : [value]
+  }
+
+  function renderNode(nodeData, nodeType, keyPrefix) {
+    if (!nodeData) return null
+
+    const renderWithChildren = (card, children, childNodeType, showLeftArm) => {
+      const cardRefs = children.map(() => React.createRef())
+
+      const childRows = children.map((child, index) => (
+        <div
+          key={`${keyPrefix}-${childNodeType}-${index}`}
+          style={{ display: 'flex', alignItems: 'center' }}
+        >
+          <HorizontalArm />
+          {renderNode(child, childNodeType, `${keyPrefix}-${childNodeType}-${index}`, cardRefs[index])}
+        </div>
+      ))
+
+      return (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {showLeftArm && <HorizontalArm />}
+          {card}
+          {children.length > 0 && (
+            <>
+              <HorizontalArm />
+              <BranchSpine showSpine={children.length > 1} cardRefs={cardRefs}>
+                {childRows}
+              </BranchSpine>
+            </>
+          )}
+        </div>
+      )
+    }
+
+    function inner(cardRef) {
+      if (nodeType === 'institution') {
+        const researchGroups = asArray(nodeData.associations?.researchGroups)
+        const directLiterature = asArray(nodeData.associations?.literature)
+        const childNodeType = researchGroups.length > 0 ? 'researchGroup' : 'literature'
+        const institutionChildren = researchGroups.length > 0 ? researchGroups : directLiterature
+
+        const card = (
+          <div ref={cardRef}>
+            <NodeCard nodeType="institution">
+              <InstitutionHead>
+                <UniLogo>
+                  <InstitutionLogo name={nodeData.name || nodeData.shortName} size={26} />
+                </UniLogo>
+                <div>
+                  <NodeTitle>{nodeData.shortName || nodeData.name}</NodeTitle>
+                  <NodeSubtitle>{nodeData.name}</NodeSubtitle>
+                </div>
+              </InstitutionHead>
+            </NodeCard>
+          </div>
+        )
+        return renderWithChildren(card, institutionChildren, childNodeType, false)
+      }
+
+      if (nodeType === 'researchGroup') {
+        const literature = asArray(nodeData.associations?.literature)
+        const card = <div ref={cardRef}><NodeCard nodeType="researchGroup"><NodeTitle>{nodeData.name || 'Research Group'}</NodeTitle></NodeCard></div>
+        return renderWithChildren(card, literature, 'literature', true)
+      }
+
+      if (nodeType === 'literature') {
+        const languageFromArray = asArray(nodeData.associations?.languages)
+        const languageFromSingle = asArray(nodeData.associations?.language)
+        const languages = languageFromArray.length > 0 ? languageFromArray : languageFromSingle
+        const card = (
+          <div ref={cardRef}>
+            <NodeCard nodeType="literature">
+              <NodeTitle>{nodeData.title || 'Untitled literature'}</NodeTitle>
+              <NodeSubtitle>{nodeData.author || 'Unknown author'}</NodeSubtitle>
+            </NodeCard>
+          </div>
+        )
+        return renderWithChildren(card, languages, 'language', true)
+      }
+
+      if (nodeType === 'language') {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <HorizontalArm />
+            <div ref={cardRef}>
+              <NodeCard nodeType="language">
+                <NodeTitle>{nodeData.name || 'Unknown language'}</NodeTitle>
+              </NodeCard>
+            </div>
+          </div>
+        )
+      }
+
+      return null
+    }
+
+    return inner(arguments[3] ?? null)
+  }
+
   return (
     <Wrapper>
       <LeftPane>
@@ -321,7 +570,7 @@ function Home() {
         </Body>
       </LeftPane>
 
-      <RightPane>
+      <RightPane id="rightpane">
         <DrawerCard onClick={() => navigate('/languages')}>
           <DrawerLabel>Languages, libraries, and SDKs ({languagesData.length || '...'})</DrawerLabel>
           <LangWrap>
@@ -367,18 +616,37 @@ function Home() {
               <LoadingText>Loading institutions...</LoadingText>
             ) : institutionsData.length > 0 ? (
               institutionsData.map((institution) => (
-                  <InstitutionItem key={institution.institutionId}>
-                    <UniLogo>
-                      <InstitutionLogo name={institution.name || institution.shortName} size={40} />
-                    </UniLogo>
-                    <UniName>{institution.shortName || institution.name}</UniName>
-                  </InstitutionItem>
+                <InstitutionItem key={institution.institutionId}>
+                  <UniLogo>
+                    <InstitutionLogo name={institution.name || institution.shortName} size={40} />
+                  </UniLogo>
+                  <UniName>{institution.shortName || institution.name}</UniName>
+                </InstitutionItem>
               ))
             ) : (
               <LoadingText>No institutions available</LoadingText>
             )}
           </InstitutionRow>
         </DrawerCard>
+        <OverviewContainer id="overviewcontainer">
+          <OverviewHeading>
+          </OverviewHeading>
+          {loading ? (
+            <LoadingText>Loading graph data...</LoadingText>
+          ) : institutionsData.length > 0 ? (
+            <DagCanvas>
+              {[...institutionsData]
+                .sort((a, b) => countNodes(b) - countNodes(a))
+                .map((institution, index) => (
+                  <div key={institution.institutionId || institution.id || index}>
+                    {renderNode(institution, 'institution', `institution-${index}`)}
+                  </div>
+                ))}
+            </DagCanvas>
+          ) : (
+            <LoadingText>No institution graph data available</LoadingText>
+          )}
+        </OverviewContainer>
       </RightPane>
     </Wrapper>
   )

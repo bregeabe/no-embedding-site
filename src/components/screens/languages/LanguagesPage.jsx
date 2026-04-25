@@ -5,6 +5,8 @@ import theme from '../../../theme.js'
 import BackButton from '../../form-elements/BackButton.jsx'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
 
+const BASE_URL = import.meta.env.VITE_BASE
+
 const Wrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -137,7 +139,7 @@ function LanguagesPage() {
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/languages')
+        const response = await fetch(`${BASE_URL}/languages`)
         const result = await response.json()
         if (result.success) {
           setLanguagesData(result.data)
@@ -185,7 +187,7 @@ function LanguagesPage() {
             <LanguageName>{language.name}</LanguageName>
             {language.description && <Description>{language.description}</Description>}
 
-            
+
             {language.associations && (
               <>
                 {language.associations.literature?.length > 0 && (
@@ -203,7 +205,7 @@ function LanguagesPage() {
                     </AssociationList>
                   </AssociationSection>
                 )}
-                
+
                 {language.associations.institutions?.length > 0 && (
                   <AssociationSection>
                     <AssociationLabel>Institutions ({language.associations.institutions.length})</AssociationLabel>

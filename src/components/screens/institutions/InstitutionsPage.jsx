@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import theme from '../../../theme.js'
 import BackButton from '../../form-elements/BackButton.jsx'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
+const BASE_URL = import.meta.env.VITE_BASE
 
 const Wrapper = styled('div')({
   display: 'flex',
@@ -134,7 +135,7 @@ function InstitutionsPage() {
   useEffect(() => {
     const fetchInstitutions = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/institutions')
+        const response = await fetch(`${BASE_URL}/institutions`)
         const result = await response.json()
         if (result.success) {
           setInstitutionsData(result.data)
@@ -173,24 +174,24 @@ function InstitutionsPage() {
       <PageTitle>Institutions ({institutionsData.length})</PageTitle>
       <InstitutionGrid>
         {institutionsData.map((institution) => (
-            <InstitutionCard key={institution.institutionId}>
-              <InstitutionHeader>
-                <InstitutionLogo name={institution.name || institution.shortName} size={32} />
-                <InstitutionNameContainer>
-                  <InstitutionName>{institution.name}</InstitutionName>
-                  {institution.shortName && institution.shortName !== institution.name && (
-                    <InstitutionShortName>{institution.shortName}</InstitutionShortName>
-                  )}
-                </InstitutionNameContainer>
-              </InstitutionHeader>
-            
+          <InstitutionCard key={institution.institutionId}>
+            <InstitutionHeader>
+              <InstitutionLogo name={institution.name || institution.shortName} size={32} />
+              <InstitutionNameContainer>
+                <InstitutionName>{institution.name}</InstitutionName>
+                {institution.shortName && institution.shortName !== institution.name && (
+                  <InstitutionShortName>{institution.shortName}</InstitutionShortName>
+                )}
+              </InstitutionNameContainer>
+            </InstitutionHeader>
+
             <InstitutionDetails>
               {institution.location && <DetailItem><strong>Location:</strong> {institution.location}</DetailItem>}
               {institution.type && <DetailItem><strong>Type:</strong> {institution.type}</DetailItem>}
             </InstitutionDetails>
-            
+
             {institution.description && <Description>{institution.description}</Description>}
-            
+
             {institution.associations && (
               <>
                 {institution.associations.researchGroups?.length > 0 && (
@@ -208,7 +209,7 @@ function InstitutionsPage() {
                     </AssociationList>
                   </AssociationSection>
                 )}
-                
+
                 {institution.associations.literature?.length > 0 && (
                   <AssociationSection>
                     <AssociationLabel>Literature ({institution.associations.literature.length})</AssociationLabel>
@@ -226,7 +227,7 @@ function InstitutionsPage() {
                 )}
               </>
             )}
-            </InstitutionCard>
+          </InstitutionCard>
         ))}
       </InstitutionGrid>
     </Wrapper>
