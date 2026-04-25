@@ -5,6 +5,8 @@ import theme from '../../../theme.js'
 import BackButton from '../../form-elements/BackButton.jsx'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
 
+const BASE_URL = import.meta.env.VITE_BASE
+
 const Wrapper = styled('div')({
   display: 'flex',
   flexDirection: 'column',
@@ -150,7 +152,7 @@ function LiteraturePage() {
   useEffect(() => {
     const fetchLiterature = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/literature')
+        const response = await fetch(`${BASE_URL}/literature`)
         const result = await response.json()
         if (result.success) {
           setLiteratureData(result.data)
@@ -192,7 +194,7 @@ function LiteraturePage() {
           <LiteratureCard key={literature.literatureId || literature.id}>
             <LiteratureTitle>{literature.title}</LiteratureTitle>
             <Author>By {literature.author}</Author>
-            
+
             <PublicationDetails>
               {literature.publication_year && (
                 <DetailChip>Year: {literature.publication_year}</DetailChip>
@@ -201,9 +203,9 @@ function LiteraturePage() {
                 <DetailChip>Language: {literature.associations.language.name}</DetailChip>
               )}
             </PublicationDetails>
-            
+
             {literature.abstract && <Abstract>{literature.abstract}</Abstract>}
-            
+
             <Links>
               {literature.doi_url && (
                 <Link href={literature.doi_url} target="_blank" rel="noopener noreferrer">
@@ -216,7 +218,7 @@ function LiteraturePage() {
                 </Link>
               )}
             </Links>
-            
+
             {literature.associations && (
               <>
                 {literature.associations.institutions?.length > 0 && (
@@ -237,7 +239,7 @@ function LiteraturePage() {
                     </AssociationList>
                   </AssociationSection>
                 )}
-                
+
                 {literature.associations.researchGroups?.length > 0 && (
                   <AssociationSection>
                     <AssociationLabel>Research Groups ({literature.associations.researchGroups.length})</AssociationLabel>

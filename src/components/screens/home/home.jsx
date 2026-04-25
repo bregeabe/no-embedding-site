@@ -4,6 +4,8 @@ import theme from '../../../theme.js'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
 import { useNavigate } from 'react-router-dom'
 
+const BASE_URL = import.meta.env.VITE_BASE
+
 const Wrapper = styled('div')({
   display: 'flex',
   flexDirection: 'row',
@@ -418,9 +420,9 @@ function Home() {
     const fetchData = async () => {
       try {
         const [langResponse, litResponse, instResponse] = await Promise.all([
-          fetch('http://localhost:8080/api/languages').catch(() => ({ ok: false })),
-          fetch('http://localhost:8080/api/literature').catch(() => ({ ok: false })),
-          fetch('http://localhost:8080/api/institutions').catch(() => ({ ok: false }))
+          fetch(`${BASE_URL}/languages`).catch(() => ({ ok: false })),
+          fetch(`${BASE_URL}/literature`).catch(() => ({ ok: false })),
+          fetch(`${BASE_URL}/institutions`).catch(() => ({ ok: false }))
         ])
 
         if (langResponse.ok) {
