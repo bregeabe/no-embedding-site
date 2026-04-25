@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { styled } from '@mui/material/styles'
 import theme from '../../../theme.js'
 import InstitutionLogo from '../../InstitutionLogo.jsx'
+import { useNavigate } from 'react-router-dom'
 
 const Wrapper = styled('div')({
   display: 'flex',
@@ -412,6 +413,7 @@ function Home() {
   const [institutionsData, setInstitutionsData] = useState([])
   const [languagesData, setLanguagesData] = useState([])
   const [literatureData, setLiteratureData] = useState([])
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
